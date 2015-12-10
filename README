@@ -1,0 +1,73 @@
+The project aims to make efficient use of spring-boot jsp and integrate it with ES autocomplete feature to get running at earliest
+Below is the mapping used 
+{
+   "settings": {
+      "analysis": {
+         "filter": {
+            "nGram_filter": {
+               "type": "nGram",
+               "min_gram": 2,
+               "max_gram": 20,
+               "token_chars": [
+                  "letter",
+                  "digit",
+                  "punctuation",
+                  "symbol"
+               ]
+            }
+         },
+         "analyzer": {
+            "nGram_analyzer": {
+               "type": "custom",
+               "tokenizer": "whitespace",
+               "filter": [
+                  "lowercase",
+                  "asciifolding",
+                  "nGram_filter"
+               ]
+            },
+            "whitespace_analyzer": {
+               "type": "custom",
+               "tokenizer": "whitespace",
+               "filter": [
+                  "lowercase",
+                  "asciifolding"
+               ]
+            }
+         }
+      }
+   },
+    "mappings": {
+        "_default_": {
+            "_all": {
+                "enabled": true,
+                "omit_norms": false
+            }
+        },
+        "cd": {
+            "properties": {
+ "name": {
+                    "type": "string",
+    "fields": {
+        "raw":   { "type": "string",  "analyzer": "nGram_analyzer" }
+    }
+
+
+                }
+                
+            },
+            "dynamic_templates": [
+                {
+                    "string_fields": {
+                        "match": "*",
+                        "match_mapping_type": "string",
+                        "mapping": {
+                            "type": "string",
+                            "index": "analyzed"
+                        }
+                    }
+                }
+            ]
+        }
+}
+}'
